@@ -11,10 +11,11 @@ namespace Oppanda.AzureTableStore
         const string DataFieldName = "data";
         private TableClient proposalTable;
 
-        public AzureTableProposalStore(string storageUri, string accountName, string accountKey)
+        public AzureTableProposalStore(string storageConnectionString)
         {
-            this.proposalTable = new TableClient(new System.Uri(storageUri), ProposalTableName,new TableSharedKeyCredential(accountName, accountKey));
+            this.proposalTable = new TableClient(storageConnectionString, ProposalTableName);
         }
+
         public async Task InitializeAsync(){
             await this.proposalTable.CreateIfNotExistsAsync();
         }
@@ -33,7 +34,7 @@ namespace Oppanda.AzureTableStore
         public Task<ProposalValidationRecord> GetProposalValidationRecordAsync(string proposalId)
         {
             // TODO:- implement.
-            return null;
+            return Task.FromResult<ProposalValidationRecord>(null);
         }
 
         public async Task InsertProposalAsync(Proposal proposal)

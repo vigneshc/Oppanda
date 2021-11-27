@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Net;
@@ -21,9 +22,25 @@ namespace OppandaCoreLib
             JObject request = null;
             try{
                 request = JsonConvert.DeserializeObject<JObject>(payload);
-                switch(request[MethodName].Value<string>().ToLowerInvariant()){
+                if(!request.TryGetValue(MethodName, System.StringComparison.InvariantCultureIgnoreCase, out JToken methodJToken)){
+                    return new Response<ErrorResponse>(){
+                            Payload =  new ErrorResponse(){
+                            ErrorMessage = "Method not provided"
+                            }
+                        }.SetStatusAndGetResponse(HttpStatusCode.BadRequest);
+                }
+
+                if(!request.TryGetValue(Payload, System.StringComparison.InvariantCultureIgnoreCase, out JToken payloadJObject)){
+                    return new Response<ErrorResponse>(){
+                            Payload =  new ErrorResponse(){
+                            ErrorMessage = "Payload not provided"
+                            }
+                        }.SetStatusAndGetResponse(HttpStatusCode.BadRequest);
+                }
+
+                switch(methodJToken.Value<string>().ToLowerInvariant()){
                     case "createproposal":
-                        var proposal = request[Payload].Value<JObject>().ToObject<Proposal>();
+                        var proposal = payloadJObject.ToObject<Proposal>();
                         var createdTime = await this.proposalManager.CreateProposalAsync(proposal);
                         return new Response<object>(){
                             Payload =  new {
@@ -32,7 +49,7 @@ namespace OppandaCoreLib
                         }.SetStatusAndGetResponse(HttpStatusCode.OK);
 
                     case "isapproved":
-                        var requestDetails = request[Payload].Value<JObject>().ToObject<Dictionary<string, string>>();
+                        var requestDetails = payloadJObject.ToObject<Dictionary<string, string>>();
                         requestDetails.TryGetValue("ProposalId", out string proposalId);
                         bool isApproved = await this.proposalManager.IsApprovedAsync(proposalId);
                         return new Response<object>(){
@@ -63,6 +80,14 @@ namespace OppandaCoreLib
                     Details = e.ToString()
                     }
                 }.SetStatusAndGetResponse(HttpStatusCode.BadRequest);
+            }
+            catch(Exception){
+                // TODO:- log
+                return new Response<ErrorResponse>(){
+                    Payload =  new ErrorResponse(){
+                    ErrorMessage = "Unexpected error.",
+                    }
+                }.SetStatusAndGetResponse(HttpStatusCode.InternalServerError);
             }
         }
 
