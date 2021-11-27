@@ -57,6 +57,8 @@ namespace OppandaCoreLib
                 throw new OppandaException("Validation handle invalid");
             }
         }
+
+        public string Serialize()=> JsonConvert.SerializeObject(this);
     }
 
     public class OppandaException: Exception{

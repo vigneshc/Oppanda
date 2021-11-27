@@ -4,3 +4,5 @@ OppandaCli/bin/
 OppandaCli/obj/
 Tests/bin/
 Tests/obj/
+AzureTableStore/bin/
+AzureTableStore/obj/

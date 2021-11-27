@@ -12,8 +12,7 @@ namespace OppandaCoreLib
         }
 
         // creates a new proposal.
-        public async Task<DateTime> CreateProposalAsync(string proposalJson){
-            Proposal proposal = Proposal.Deserialize(proposalJson);
+        public async Task<DateTime> CreateProposalAsync(Proposal proposal){
             proposal.Validate();
             proposal.AmendmentNumber = 0;
             proposal.CreatedDate = DateTime.UtcNow;
@@ -44,7 +43,7 @@ namespace OppandaCoreLib
         }
 
         // Retrieve proposal, check if validator in payload is in the list, check signature and update proposal.
-        public Task AddApprovalWithSignatureAsync(string payload, string signature){
+        public Task AddApprovalWithSignatureAsync(string proposalId, string payload, string signature){
             throw new NotImplementedException();
         }
     }
