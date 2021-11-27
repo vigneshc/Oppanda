@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CoreLib\CoreLib.csproj" />
+    <ProjectReference Include="..\AzureTableStore\AzureTableStore.csproj" />
   </ItemGroup>
 
   <ItemGroup>

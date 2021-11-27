@@ -6,3 +6,5 @@ Tests/bin/
 Tests/obj/
 AzureTableStore/bin/
 AzureTableStore/obj/
+Configs/
+.vscode/

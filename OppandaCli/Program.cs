@@ -1,12 +1,26 @@
 ﻿using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace OppandaCli
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            string configFile = args[0];
+            var executor = OppandaLauncher.GetRpcExecutor(OppandaConfig.Deserialize(await File.ReadAllTextAsync(configFile)));
+            
+            while(true){
+                Console.Write("Input RPC File: ");
+                var fileName = Console.ReadLine();
+                var rpcContent = await File.ReadAllTextAsync(fileName);
+                var result = await executor.ExecuteAsync(rpcContent);
+                Console.WriteLine("Result");
+                Console.WriteLine(result.Item1);
+                Console.WriteLine(result.Item2);
+                Console.WriteLine();
+            }
         }
     }
 }
