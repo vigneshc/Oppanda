@@ -51,10 +51,12 @@ namespace OppandaCoreLib
                     case "isapproved":
                         var requestDetails = payloadJObject.ToObject<Dictionary<string, string>>();
                         requestDetails.TryGetValue("ProposalId", out string proposalId);
-                        bool isApproved = await this.proposalManager.IsApprovedAsync(proposalId);
+                        requestDetails.TryGetValue("ApprovalMetadata", out string approvalMetadata);
+                        (bool isApproved, string validationRecordCid) = await this.proposalManager.IsApprovedAsync(proposalId, approvalMetadata);
                         return new Response<object>(){
                             Payload =  new {
-                                IsApproved = isApproved
+                                IsApproved = isApproved,
+                                ValidationRecordCID = validationRecordCid
                             }
                         }.SetStatusAndGetResponse(HttpStatusCode.OK);
                     default:

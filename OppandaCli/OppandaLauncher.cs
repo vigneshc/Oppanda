@@ -1,4 +1,5 @@
 using OppandaCoreLib;
+using OppandaCoreLib.TwitterIntegration;
 using Oppanda.AzureTableStore;
 using System.Threading.Tasks;
 
