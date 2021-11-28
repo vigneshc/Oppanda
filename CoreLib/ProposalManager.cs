@@ -32,7 +32,7 @@ namespace OppandaCoreLib
             }
 
             // query twitter again.
-            if(proposal.ApprovalType == ApprovalType.Twitter && validationRecord == null || validationRecord.LastUpdated < DateTime.UtcNow.AddMinutes(-30)){
+            if(proposal.ApprovalType == ApprovalType.Twitter && (validationRecord == null || validationRecord.LastUpdated < DateTime.UtcNow.AddMilliseconds(-30))){
                 ulong minTweetId = 1000;
                 if(!string.IsNullOrEmpty(approvalMetadata) && ulong.TryParse(approvalMetadata, out ulong parsedMinTweetId) ){
                     minTweetId = parsedMinTweetId;
