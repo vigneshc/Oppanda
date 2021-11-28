@@ -27,8 +27,9 @@ namespace OppandaCoreLib.TwitterIntegration
 
             bool IsValidTweet(RawTweet tweet){
                 return tweet.entities != null &&
-                tweet.entities.hashtags.Any(hashtag => hashtag.text.Equals(proposalId) && // has proposalId
-                    (hashtag.text.Equals(Approve, StringComparison.InvariantCulture) || hashtag.text.Equals(DisApprove, StringComparison.InvariantCulture))); // has either approve or disapprove
+                tweet.entities.hashtags.Any(hashtag => hashtag.text.Equals(proposalId)) && // has proposalId
+                tweet.entities.hashtags.Any(
+                    hashtag => hashtag.text.Equals(Approve, StringComparison.InvariantCulture) || hashtag.text.Equals(DisApprove, StringComparison.InvariantCulture)); // has either approve or disapprove
             }
 
             bool IsApproved(RawTweet approvalTweet){

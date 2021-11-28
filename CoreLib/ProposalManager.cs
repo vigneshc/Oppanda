@@ -27,12 +27,12 @@ namespace OppandaCoreLib
         public async Task<(bool IsApproved, string ValidationRecordCID)> IsApprovedAsync(string proposalId, string approvalMetadata){
             Proposal proposal = await this.proposalStore.GetProposalAsync(proposalId);
             ProposalValidationRecord validationRecord = await this.proposalStore.GetProposalValidationRecordAsync(proposalId);
-            if(validationRecord != null && validationRecord.IsApprovalComplete(proposal)){
+            if(proposal!= null && validationRecord != null && validationRecord.IsApprovalComplete(proposal)){
                 return (true, validationRecord.ValidationRecordCID);
             }
 
             // query twitter again.
-            if(proposal.ApprovalType == ApprovalType.Twitter && (validationRecord == null || validationRecord.LastUpdated < DateTime.UtcNow.AddMilliseconds(-30))){
+            if(proposal != null && proposal.ApprovalType == ApprovalType.Twitter && (validationRecord == null || validationRecord.LastUpdated < DateTime.UtcNow.AddMilliseconds(-30))){
                 ulong minTweetId = 1000;
                 if(!string.IsNullOrEmpty(approvalMetadata) && ulong.TryParse(approvalMetadata, out ulong parsedMinTweetId) ){
                     minTweetId = parsedMinTweetId;

@@ -22,13 +22,19 @@ namespace Oppanda.AzureTableStore
 
         public async Task<Proposal> GetProposalAsync(string proposalId)
         {
-            var response = await this.proposalTable.GetEntityAsync<TableEntity>(proposalId, proposalId);
-            var entity = response.Value;
-            if(entity == null){
-                throw new OppandaException("Invalid proposal");
-            }
+            try{
+                var response = await this.proposalTable.GetEntityAsync<TableEntity>(proposalId, proposalId);
+                var entity = response.Value;
+                if(entity == null){
+                    throw new OppandaException("Invalid proposal");
+                }
 
-            return Proposal.Deserialize(entity.GetString(DataFieldName));
+                return Proposal.Deserialize(entity.GetString(DataFieldName));
+            }
+            catch(RequestFailedException){
+                // TODO:- log.
+                return null;
+            }
         }
 
         public Task<ProposalValidationRecord> GetProposalValidationRecordAsync(string proposalId)
