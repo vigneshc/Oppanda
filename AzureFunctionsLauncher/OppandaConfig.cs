@@ -1,7 +1,7 @@
 using System;
 using Newtonsoft.Json;
 
-namespace OppandaCli
+namespace Oppanda.AzureFunctions
 {
     public class OppandaConfig{
         public string StorageConnectionString { get; set; }

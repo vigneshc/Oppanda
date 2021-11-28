@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using OppandaCoreLib;
+using Oppanda.AzureFunctions;
 
 namespace OppandaCli
 {
@@ -10,7 +10,7 @@ namespace OppandaCli
         static async Task Main(string[] args)
         {
             string configFile = args[0];
-            var executor = await OppandaLauncher.GetRpcExecutorAsync(OppandaConfig.Deserialize(await File.ReadAllTextAsync(configFile)));
+            var executor = await RpcExecutorFactory.GetRpcExecutorAsync(OppandaConfig.Deserialize(await File.ReadAllTextAsync(configFile)));
 
             while(true){
                 Console.Write("Input RPC File: ");

@@ -8,3 +8,5 @@ AzureTableStore/bin/
 AzureTableStore/obj/
 Configs/
 .vscode/
+AzureFunctionsLauncher/bin/
+AzureFunctionsLauncher/obj/

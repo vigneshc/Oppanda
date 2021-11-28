@@ -3,9 +3,9 @@ using OppandaCoreLib.TwitterIntegration;
 using Oppanda.AzureTableStore;
 using System.Threading.Tasks;
 
-namespace OppandaCli
+namespace Oppanda.AzureFunctions
 {
-    public static class OppandaLauncher{
+    public static class RpcExecutorFactory {
         public async static Task<RpcExecutor> GetRpcExecutorAsync(OppandaConfig config){
             AzureTableProposalStore proposalStore = new AzureTableProposalStore(config.StorageConnectionString);
             await proposalStore.InitializeAsync();
