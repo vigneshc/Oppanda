@@ -17,7 +17,27 @@ namespace OppandaCoreLib
             this.proposalManager = proposalManager;
         }
 
-        // Executes rpcs and returns a response
+        // Executes rpcs and returns a response. Entry point for azure functions.
+        public async Task<(HttpStatusCode,string)> ExecuteAsync(IDictionary<string, string> queryParameters, string bodyString){
+            if(queryParameters.TryGetValue("type", out string typeValue) && !string.IsNullOrEmpty(typeValue) && typeValue.Equals("jsonrpc", StringComparison.InvariantCultureIgnoreCase)){
+                // https://<functionUrl>?type=jsonrpc , with body containing json parameters.
+                return await ExecuteAsync(bodyString);
+            }
+            else
+            {
+                // isApproved method, https://<functionUrl>?proposalId=<proposalId>
+                bool approved = false;
+                if(queryParameters.TryGetValue("proposalId", out string proposalId) && !string.IsNullOrEmpty(proposalId)){
+                    approved = (await this.proposalManager.IsApprovedAsync(proposalId, approvalMetadata: null)).IsApproved;
+                }
+                var responseObj = new {
+                    Approved = approved
+                };
+                return (HttpStatusCode.OK, JsonConvert.SerializeObject(responseObj));
+            }
+        }
+
+        // Executes rpcs and returns a response for payload.
         public async Task<(HttpStatusCode,string)> ExecuteAsync(string payload){
             JObject request = null;
             try{
