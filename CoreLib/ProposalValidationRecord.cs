@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace OppandaCoreLib
 {
@@ -8,6 +9,8 @@ namespace OppandaCoreLib
         public DateTime LastUpdated { get; set; }
         public string ProposalId { get; set; }
         public ValidatorRecord[] ValidationRecords { get; set; }
+
+        public string ApprovalMetadata { get; set; }
         
         // TODO:- store in IPFS and set CID.
         public string ValidationRecordCID { get; set; }
@@ -18,6 +21,9 @@ namespace OppandaCoreLib
             .Except(this.ValidationRecords.Where(h => h.Approved).Select(h => h.ValidatorHandle))
             .Any();
         }
+
+        public string Serialize() => JsonConvert.SerializeObject(this);
+        public static ProposalValidationRecord Deserialize(string json)=> JsonConvert.DeserializeObject<ProposalValidationRecord>(json);
     }
 
     // represents a single validator's approval.

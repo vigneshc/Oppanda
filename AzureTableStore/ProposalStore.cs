@@ -8,16 +8,20 @@ namespace Oppanda.AzureTableStore
     public class AzureTableProposalStore : IProposalStore
     {
         const string ProposalTableName = "proposals";
+        const string ValidationRecordsTableName = "validationrecords";
         const string DataFieldName = "data";
         private TableClient proposalTable;
+        private TableClient validationRecordsTable;
 
         public AzureTableProposalStore(string storageConnectionString)
         {
             this.proposalTable = new TableClient(storageConnectionString, ProposalTableName);
+            this.validationRecordsTable = new TableClient(storageConnectionString, ValidationRecordsTableName);
         }
 
         public async Task InitializeAsync(){
             await this.proposalTable.CreateIfNotExistsAsync();
+            await this.validationRecordsTable.CreateIfNotExistsAsync();
         }
 
         public async Task<Proposal> GetProposalAsync(string proposalId)
@@ -37,10 +41,14 @@ namespace Oppanda.AzureTableStore
             }
         }
 
-        public Task<ProposalValidationRecord> GetProposalValidationRecordAsync(string proposalId)
+        public async Task<ProposalValidationRecord> GetProposalValidationRecordAsync(string proposalId)
         {
-            // TODO:- implement.
-            return Task.FromResult<ProposalValidationRecord>(null);
+            var entity = await this.GetProposalValidationEntityAsync(proposalId);
+            if(entity != null){
+                return ProposalValidationRecord.Deserialize(entity.GetString(DataFieldName));
+            }
+
+            return null;
         }
 
         public async Task InsertProposalAsync(Proposal proposal)
@@ -60,10 +68,49 @@ namespace Oppanda.AzureTableStore
             }
         }
 
-        public Task UpdateProposalValidationRecordAsync(ProposalValidationRecord newRecord)
+        public async Task UpdateProposalValidationRecordAsync(ProposalValidationRecord newRecord)
         {
-            // TODO:- implement
-            return Task.CompletedTask;
+            var oldValidationRecord = await GetProposalValidationEntityAsync(newRecord.ProposalId);
+            ETag ifMatchEtag = ETag.All;
+            if(oldValidationRecord != null){
+                ifMatchEtag = oldValidationRecord.ETag;
+            }
+
+            var newValidationRecord = new TableEntity()
+            {
+                PartitionKey = newRecord.ProposalId,
+                RowKey = newRecord.ProposalId
+            };
+
+            newValidationRecord.Add(DataFieldName, newRecord.Serialize());
+            try{
+                await this.validationRecordsTable.UpdateEntityAsync(newValidationRecord, ifMatchEtag, TableUpdateMode.Replace);
+            }
+            catch(RequestFailedException e){
+                // TODO:- log. Only ignore 409.
+                throw new OppandaException("Error Updating validation record", e);
+            }
+
+            return;
         }
+        
+        private async Task<TableEntity> GetProposalValidationEntityAsync(string proposalId)
+        {
+            try
+            {
+                var response = await this.validationRecordsTable.GetEntityAsync<TableEntity>(proposalId, proposalId);
+                var entity = response.Value;
+                if(entity != null){
+                    return entity;
+                }
+            }
+            catch(RequestFailedException)
+            {
+                // ignore
+            }
+
+            return null;
+        }
+
     }
 }

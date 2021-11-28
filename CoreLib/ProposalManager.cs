@@ -34,12 +34,17 @@ namespace OppandaCoreLib
             // query twitter again.
             if(proposal != null && proposal.ApprovalType == ApprovalType.Twitter && (validationRecord == null || validationRecord.LastUpdated < DateTime.UtcNow.AddMilliseconds(-30))){
                 ulong minTweetId = 1000;
+                if(approvalMetadata == null){
+                    approvalMetadata = validationRecord?.ApprovalMetadata;
+                }
+                
                 if(!string.IsNullOrEmpty(approvalMetadata) && ulong.TryParse(approvalMetadata, out ulong parsedMinTweetId) ){
                     minTweetId = parsedMinTweetId;
                 }
 
                 var newValidationRecord = await this.twitterValidator.GetProposalValidationRecordAsync(proposal, minTweetId);
                 newValidationRecord.LastUpdated = DateTime.UtcNow;
+                newValidationRecord.ApprovalMetadata = approvalMetadata;
                 await this.proposalStore.UpdateProposalValidationRecordAsync(newValidationRecord);
                 return (newValidationRecord.IsApprovalComplete(proposal), newValidationRecord.ValidationRecordCID);
             }
