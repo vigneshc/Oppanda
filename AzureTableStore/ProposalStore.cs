@@ -70,12 +70,6 @@ namespace Oppanda.AzureTableStore
 
         public async Task UpdateProposalValidationRecordAsync(ProposalValidationRecord newRecord)
         {
-            var oldValidationRecord = await GetProposalValidationEntityAsync(newRecord.ProposalId);
-            ETag ifMatchEtag = ETag.All;
-            if(oldValidationRecord != null){
-                ifMatchEtag = oldValidationRecord.ETag;
-            }
-
             var newValidationRecord = new TableEntity()
             {
                 PartitionKey = newRecord.ProposalId,
@@ -83,8 +77,10 @@ namespace Oppanda.AzureTableStore
             };
 
             newValidationRecord.Add(DataFieldName, newRecord.Serialize());
-            try{
-                await this.validationRecordsTable.UpdateEntityAsync(newValidationRecord, ifMatchEtag, TableUpdateMode.Replace);
+            try
+            {
+                // TODO:- last write wins. Should fail on conflict instead.
+                await this.validationRecordsTable.UpsertEntityAsync(newValidationRecord, TableUpdateMode.Replace);
             }
             catch(RequestFailedException e){
                 // TODO:- log. Only ignore 409.
