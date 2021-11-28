@@ -1,9 +1,11 @@
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Net;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using System.Threading;
 
 namespace OppandaCoreLib
 {
@@ -13,12 +15,29 @@ namespace OppandaCoreLib
         const string Payload = "payload";
 
         private readonly ProposalManager proposalManager;
-        public RpcExecutor(ProposalManager proposalManager){
+        private int maxRequestsPerMinute;
+        private Stopwatch timer;
+        private object lockObject = new Object();
+        private int remainingRequests;
+
+        public RpcExecutor(ProposalManager proposalManager, int maxRequestsPerMinute){
             this.proposalManager = proposalManager;
+            this.maxRequestsPerMinute = maxRequestsPerMinute;
+            if(this.maxRequestsPerMinute > 0){
+                this.remainingRequests = this.maxRequestsPerMinute;
+                timer = Stopwatch.StartNew();
+            }
         }
 
         // Executes rpcs and returns a response. Entry point for azure functions.
         public async Task<(HttpStatusCode,string)> ExecuteAsync(IDictionary<string, string> queryParameters, string bodyString){
+            if(this.maxRequestsPerMinute > 0){
+                this.ResetLimit();
+                if(Interlocked.Decrement(ref this.remainingRequests) <= 0){
+                    return (HttpStatusCode.TooManyRequests, "Exceeded limits");
+                }
+            }
+
             if(queryParameters.TryGetValue("type", out string typeValue) && !string.IsNullOrEmpty(typeValue) && typeValue.Equals("jsonrpc", StringComparison.InvariantCultureIgnoreCase)){
                 // https://<functionUrl>?type=jsonrpc , with body containing json parameters.
                 return await ExecuteAsync(bodyString);
@@ -38,7 +57,7 @@ namespace OppandaCoreLib
         }
 
         // Executes rpcs and returns a response for payload.
-        public async Task<(HttpStatusCode,string)> ExecuteAsync(string payload){
+        internal async Task<(HttpStatusCode,string)> ExecuteAsync(string payload){
             JObject request = null;
             try{
                 request = JsonConvert.DeserializeObject<JObject>(payload);
@@ -110,6 +129,15 @@ namespace OppandaCoreLib
                     ErrorMessage = "Unexpected error.",
                     }
                 }.SetStatusAndGetResponse(HttpStatusCode.InternalServerError);
+            }
+        }
+
+        private void ResetLimit(){
+            if(this.timer.ElapsedMilliseconds > 60000){
+                lock(this.lockObject){
+                    Interlocked.Exchange(ref this.remainingRequests, this.maxRequestsPerMinute);
+                    this.timer.Restart();
+                }
             }
         }
 

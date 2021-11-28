@@ -11,7 +11,7 @@ namespace Oppanda.AzureFunctions
             await proposalStore.InitializeAsync();
             TwitterValidator twitterValidator = new TwitterValidator(config.TwitterConfig);
             ProposalManager proposalManager = new ProposalManager(proposalStore, twitterValidator);
-            RpcExecutor executor = new RpcExecutor(proposalManager);
+            RpcExecutor executor = new RpcExecutor(proposalManager, config.MaxRequestsPerMinute);
             return executor;
         }
     }
