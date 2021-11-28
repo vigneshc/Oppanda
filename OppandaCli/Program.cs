@@ -8,6 +8,7 @@ namespace OppandaCli
 {
     class Program
     {
+        // used for easier local testing.
         static async Task Main(string[] args)
         {
             string configFileUrlFile = args[0];
