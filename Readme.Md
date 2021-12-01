@@ -1,5 +1,4 @@
-**Oppanda** is an experimental project to add support for creating off chain proposals with defined validators that can be funded. Proposals are defined off-chain and `proposal=> external validator url` is recorded onchain.
-Currently there are two kinds of validators - *Twitter* and *signature proofs* (signature proof is in progress).
+**Oppanda** is an experimental project to add support for creating off chain proposals with defined validators that can be funded. Proposals are defined off-chain and `proposal=> external validator url` is recorded onchain.Funds are transfered when external oracle validates that proposal is approved by validators. Currently proposals can be validated through tweets from validators. Off-chain signature proofs will be added soon.
 
 
 ## Concepts
