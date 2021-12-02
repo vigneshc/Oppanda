@@ -34,12 +34,25 @@ Proposer can define a proposal with reputed twitter handles as validators and la
 
 ## Code structure
 1. *EthContracts/*: Solidity contracts. There is only one now.
-2. *CoreLib/*: Definition for contracts, twitter validation and IPFS interaction (in progress).
+2. *CoreLib/*: Definition for contracts, twitter validation and IPFS interaction.
 3. *AzureTableStore/*: Storage for proposal entries and validation records.
 4. *AzureFunctionsLauncher/*: Helper methods for hosting it in azure function.
 5. *OppandaCli/*: Launches it locally. Used for testing.
 
 
+## Hosting
+
+1. `RpcExecutor.ExecuteAsync(queryParameters, bodyString)` is the entry point. Call this with http query parameters and request body.
+2. When `type=jsonrpc` is added to queryParameters, it executes the json rpc request. Format of requests is described later.
+3. Without `type=jsonrpc` parameter, it executes `IsApprovedAsync` taking `proposalId` query parameter. It would return a json response of the form below.
+```json
+{
+    "Approved": <true/false>
+}
+```
+4. `OppandaFunctionsRunner.Initialize` has the initialization code that reads config and creates `RpcExecutor`. 
+
+Above pieces should support hosting in a variety of environments. 
 
 
 
