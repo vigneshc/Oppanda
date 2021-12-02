@@ -22,7 +22,10 @@ namespace OppandaCoreLib
         public DateTime EndDate { get; set; }
         public bool IsAmended { get;set; }
         public string PreviousProposalCID { get; set; }
+        public string ProposalCID { get; set; }
         public uint AmendmentNumber { get; set;}
+
+        public bool StoreInIPFS { get; set; }
 
         /* ApprovalType = Twitter ==> Require a tweet that includes #ProposalId and ( #Approve or #DisApprove) from each handle listed in ValidatorHandles.
         *  ApprovalType = OfflineSignatures ==> Each key listed should sign {"Id": "<Id>", "Approved": "<true/false>"}

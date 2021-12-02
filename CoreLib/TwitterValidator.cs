@@ -49,7 +49,15 @@ namespace OppandaCoreLib.TwitterIntegration
             // collect validation record for each handle.
             List<ValidatorRecord> validatorRecords = new List<ValidatorRecord>();
             foreach(var validatorHandle in validatorsHandle.Distinct()){
-                RawTweet approvalTweet = JsonConvert.DeserializeObject<RawTweet[]>((await this.GetTweetsResponseAsync(validatorHandle, minTweetId)))
+                var tweetsString = string.Empty;
+                try{
+                    tweetsString = await this.GetTweetsResponseAsync(validatorHandle, minTweetId);
+                }catch(OppandaException){
+                    // TODO:- log
+                    continue;
+                }
+
+                RawTweet approvalTweet = JsonConvert.DeserializeObject<RawTweet[]>((tweetsString))
                 .Where(tweet => IsValidTweet(tweet))
                 .OrderByDescending(tweet => tweet.id)
                 .FirstOrDefault();
@@ -118,14 +126,31 @@ namespace OppandaCoreLib.TwitterIntegration
             request.ContentType = "application/x-www-form-urlencoded";
             request.PreAuthenticate = true;
 
-            var tresponse = await request.GetResponseAsync();
-            using(var responseStream = tresponse.GetResponseStream())
+            try
             {
-                using(var sr = new StreamReader(responseStream))
+                var tresponse = await request.GetResponseAsync();
+                using(var responseStream = tresponse.GetResponseStream())
                 {
-                    var response = await sr.ReadToEndAsync();
-                    return response;
+                    using(var sr = new StreamReader(responseStream))
+                    {
+                        var response = await sr.ReadToEndAsync();
+                        return response;
+                    }
                 }
+            }
+            catch(WebException e){
+                string errorResponse = string.Empty;
+                using(var errorStream = e.Response.GetResponseStream())
+                {
+                    using(var sr = new StreamReader(errorStream))
+                    {
+                        errorResponse = sr.ReadToEnd();
+                    }
+                }
+
+                throw new OppandaException(
+                    "error while retrieving tweet.", 
+                    new OppandaException($"Error Response: {errorResponse}"));
             }
         }
     }

@@ -80,10 +80,11 @@ namespace OppandaCoreLib
                 switch(methodJToken.Value<string>().ToLowerInvariant()){
                     case "createproposal":
                         var proposal = payloadJObject.ToObject<Proposal>();
-                        var createdTime = await this.proposalManager.CreateProposalAsync(proposal);
+                        (var createdTime, var cid) = await this.proposalManager.CreateProposalAsync(proposal);
                         return new Response<object>(){
                             Payload =  new {
-                                CreatedDate = createdTime
+                                CreatedDate = createdTime,
+                                IPFSCID = cid
                             }
                         }.SetStatusAndGetResponse(HttpStatusCode.OK);
 

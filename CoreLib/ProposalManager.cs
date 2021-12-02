@@ -1,23 +1,31 @@
 using System;
 using System.Threading.Tasks;
+using OppandaCoreLib.IPFS;
 
 namespace OppandaCoreLib
 {
     public class ProposalManager{
         private readonly IProposalStore proposalStore;
         private readonly ITwitterValidator twitterValidator;
-        public ProposalManager(IProposalStore proposalStore, ITwitterValidator twitterValidator){
+        private readonly Web3Client web3Client;
+
+        public ProposalManager(IProposalStore proposalStore, ITwitterValidator twitterValidator, Web3Client web3Client){
             this.proposalStore = proposalStore;
             this.twitterValidator = twitterValidator;
+            this.web3Client = web3Client;
         }
 
         // creates a new proposal.
-        public async Task<DateTime> CreateProposalAsync(Proposal proposal){
+        public async Task<(DateTime CreatedTime, string IPFSCID)> CreateProposalAsync(Proposal proposal){
             proposal.Validate();
             proposal.AmendmentNumber = 0;
             proposal.CreatedDate = DateTime.UtcNow;
+            if(proposal.StoreInIPFS){
+                proposal.ProposalCID = await this.web3Client.UploadContentAsync(proposal.Serialize());
+            }
+
             await this.proposalStore.InsertProposalAsync(proposal);
-            return proposal.CreatedDate;
+            return (proposal.CreatedDate, proposal.ProposalCID);
         }
 
         public Task AmendProposalAsync(string newProposalJson){
@@ -45,6 +53,10 @@ namespace OppandaCoreLib
                 var newValidationRecord = await this.twitterValidator.GetProposalValidationRecordAsync(proposal, minTweetId);
                 newValidationRecord.LastUpdated = DateTime.UtcNow;
                 newValidationRecord.ApprovalMetadata = approvalMetadata;
+                if(proposal.StoreInIPFS){
+                    newValidationRecord.ValidationRecordCID = await this.web3Client.UploadContentAsync(newValidationRecord.Serialize());
+                }
+                
                 await this.proposalStore.UpdateProposalValidationRecordAsync(newValidationRecord);
                 return (newValidationRecord.IsApprovalComplete(proposal), newValidationRecord.ValidationRecordCID);
             }
