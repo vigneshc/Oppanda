@@ -17,7 +17,8 @@ namespace OppandaCoreLib
 
         public bool IsApprovalComplete(Proposal proposal){
             // no un approved validators.
-            return !proposal.ValidatorHandles
+            return this.ValidationRecords != null && 
+            !proposal.ValidatorHandles
             .Except(this.ValidationRecords.Where(h => h.Approved).Select(h => h.ValidatorHandle))
             .Any();
         }
@@ -36,6 +37,7 @@ namespace OppandaCoreLib
         public string RecordCID { get; set; }
         
         // Id of validation record. For twitter, it will be tweet id.
+        // For signature based record, it will be serialized SignatureRecord.
         public string ValidationRecordId { get; set; }
     }
 }

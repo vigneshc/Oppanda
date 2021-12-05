@@ -21,10 +21,15 @@ namespace OppandaCoreLib.IPFS
         }
 
         public async Task<string> GetContentStringAsync(string cid){
-            using(var responseStream = await this.GetContentStreamAsync(cid))
-            using(var sr = new StreamReader(responseStream))
-            {
-                return await sr.ReadToEndAsync();
+            try{
+                using(var responseStream = await this.GetContentStreamAsync(cid))
+                using(var sr = new StreamReader(responseStream))
+                {
+                    return await sr.ReadToEndAsync();
+                }
+            }
+            catch(OppandaException){
+                return null;
             }
         }
     }

@@ -12,7 +12,7 @@ A solidity contract that records `proposalId => (Oracle Url, AvailableFund)`.
 * A *Json* document describing who the validators along with IPFS CID that provides human readable details.
 * Defines oracle type. Currently *Twitter* and *signature proofs* are added.
     * Twitter - Validators is a set of twitter handles. To approve a proposal, all validators should tweet with both `#<proposalId>` and `#approve` hashtags in the tweet.
-    * Signature Proof - Proposer should record a IPFS CID that contains signature from all validators. This is in progress.
+    * Signature Proof - Proposer should record a IPFS CID that contains signature from all validators. File format is in `SignatureBasedApproval.cs`.
 
 ### Off-Chain Oracle
 * External service that is able to confirm if a proposal has been validated by the validators. Both *twitter* and *signature proof* can be validated by anyone. Function of oracle is to provide this service and it introduces a point of centralization.
@@ -53,7 +53,4 @@ Proposer can define a proposal with reputed twitter handles as validators and la
 4. `OppandaFunctionsRunner.Initialize` has the initialization code that reads config and creates `RpcExecutor`. 
 
 Above pieces should support hosting in a variety of environments. 
-
-
-
 
