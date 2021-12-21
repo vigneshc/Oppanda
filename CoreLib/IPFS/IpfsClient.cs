@@ -16,7 +16,7 @@ namespace OppandaCoreLib.IPFS
                 return response.GetResponseStream();
             }
             catch(WebException e){
-                throw new OppandaException("error while send request to web3.storage", e);
+                throw new OppandaException("error while getting stream from ipfs gateway", e);
             }
         }
 

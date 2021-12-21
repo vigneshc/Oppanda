@@ -12,7 +12,6 @@ namespace OppandaCoreLib
 
         public string ApprovalMetadata { get; set; }
         
-        // TODO:- store in IPFS and set CID.
         public string ValidationRecordCID { get; set; }
 
         public bool IsApprovalComplete(Proposal proposal){

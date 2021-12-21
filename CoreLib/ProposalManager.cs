@@ -4,6 +4,7 @@ using OppandaCoreLib.IPFS;
 
 namespace OppandaCoreLib
 {
+    // main class for handling proposals.
     public class ProposalManager{
         private readonly IProposalStore proposalStore;
         private readonly ITwitterValidator twitterValidator;

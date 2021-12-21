@@ -66,11 +66,9 @@ namespace OppandaCoreLib
 
     public class OppandaException: Exception{
         public OppandaException(string message): base(message) {
-
         }
 
         public OppandaException(string message, Exception e): base(message, e){
-
         }
     }
 }
