@@ -55,7 +55,7 @@ namespace OppandaCoreLib
                     minTweetId = parsedMinTweetId;
                 }
 
-                var newValidationRecord = await this.twitterValidator.GetProposalValidationRecordAsync(proposal, minTweetId);
+                ProposalValidationRecord newValidationRecord = await this.twitterValidator.GetProposalValidationRecordAsync(proposal, minTweetId);
                 await UpdateValidationRecordAsync(newValidationRecord, proposal, approvalMetadata);
                 return (newValidationRecord.IsApprovalComplete(proposal), newValidationRecord.ValidationRecordCID);
             }

@@ -1,5 +1,5 @@
-**Oppanda** is an experimental project to add support for creating off chain proposals with defined validators that can be funded. Proposals are defined off-chain and `proposal=> external validator url` is recorded onchain.Funds are transfered when external oracle validates that proposal is approved by validators. Currently proposals can be validated through tweets from validators. Off-chain signature proofs will be added soon.
-
+**Oppanda** is an experimental project to add support for creating off chain proposals with defined validators that can be funded. Proposals are defined off-chain and `proposal=> external validator url` is recorded onchain. Funds are transfered when external oracle validates that proposal is approved by validators. Currently proposals can be validated through tweets from validators and Off-chain signatures stored in IPFS.
+Proposals and approval records are optionally stored in IPFS using Web3.Storage api.
 
 ## Concepts
 ### On-Chain Contract
@@ -54,3 +54,13 @@ Proposer can define a proposal with reputed twitter handles as validators and la
 
 Above pieces should support hosting in a variety of environments. 
 
+## Next Steps
+
+1. Better documentation for creating and approving proposals.
+2. Share hosted url for `Oppanda Oracle`
+3. Solidity Contract updates
+     - Implement withdrawal.
+     - Require LINK tokens for request funds api calls.
+     - Emit events.
+     - Mainnet deployment.
+4. UX for querying proposals, statuses.

@@ -33,7 +33,7 @@ namespace OppandaCoreLib
                 return result;
             }
 
-            // 1. or each address in validator handle
+            // 1. for each address in validator handle
             foreach(var validator in proposal.ValidatorHandles){
 
                 // 2. Get the corresponding signature.
